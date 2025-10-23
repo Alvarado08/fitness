@@ -1,5 +1,6 @@
 import 'package:fitness/models/category_model.dart';
 import 'package:fitness/models/diet_model.dart';
+import 'package:fitness/models/popular_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -13,6 +14,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   List<CategoryModel> categories = [];
   List<DietModel> diets = [];
+  List<PopularDietsModel> popularDiets = [];
 
   // void _getCategories() {
   //   categories = CategoryModel.getCategories();
@@ -25,6 +27,7 @@ class _HomePageState extends State<HomePage> {
   void _getInitialInfo() {
     categories = CategoryModel.getCategories();
     diets = DietModel.getDiets();
+    popularDiets = PopularDietsModel.getPopularDiets();
   }
 
   @override
@@ -32,15 +35,103 @@ class _HomePageState extends State<HomePage> {
     _getInitialInfo();
     return Scaffold(
       appBar: appBar(),
-      body: Column(
+      body: ListView(
         children: [
           _searchField(),
           SizedBox(height: 40),
           _categoriesSection(),
           SizedBox(height: 40),
           _dietSection(),
+          SizedBox(height: 40),
+          _popularDietsSection(),
         ],
       ),
+    );
+  }
+
+  Column _popularDietsSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 12),
+          child: Text(
+            'Popular Diets',
+            style: TextStyle(
+              color: Colors.black,
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+        SizedBox(height: 15),
+        SizedBox(
+          height: 200,
+          child: ListView.separated(
+            itemBuilder: (context, index) {
+              return Container(
+                height: 100,
+                decoration: BoxDecoration(
+                  color: popularDiets[index].boxIsSelected
+                      ? Colors.white
+                      : Colors.transparent,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: popularDiets[index].boxIsSelected
+                      ? [
+                          BoxShadow(
+                            color: Color(0xff1D1617).withOpacity(0.07),
+                            spreadRadius: 0,
+                            blurRadius: 40,
+                            offset: Offset(0, 10), // changes position of shadow
+                          ),
+                        ]
+                      : [],
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    SvgPicture.asset(popularDiets[index].iconPath),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(
+                          popularDiets[index].name,
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        Text(
+                          '${popularDiets[index].level} | ${popularDiets[index].duration} | ${popularDiets[index].calorie}',
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                      ],
+                    ),
+                    GestureDetector(
+                      onTap: () {},
+                      child: SvgPicture.asset(
+                        'assets/icons/button.svg',
+                        width: 30,
+                        height: 30,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+            shrinkWrap: true,
+            separatorBuilder: (context, index) => SizedBox(height: 25),
+            itemCount: popularDiets.length,
+            padding: EdgeInsets.only(left: 20, right: 20),
+          ),
+        ),
+      ],
     );
   }
 
@@ -60,7 +151,7 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
         SizedBox(height: 15),
-        Container(
+        SizedBox(
           height: 200,
           child: ListView.separated(
             itemBuilder: (context, index) {
@@ -94,7 +185,7 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ],
                     ),
-                    Container(
+                    SizedBox(
                       height: 35,
                       width: 130,
                       child: ElevatedButton(
@@ -158,7 +249,7 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
         SizedBox(height: 15),
-        Container(
+        SizedBox(
           height: 120,
           child: ListView.separated(
             itemCount: categories.length,
